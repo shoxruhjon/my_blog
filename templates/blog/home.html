@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+    <h1>Welcome to the Blog</h1>
+
+    <div>
+        {% if user.is_authenticated %}
+            <p>Welcome, {{ user.username }}! <a href="{% url 'logout' %}">Logout</a></p>
+            <a href="{% url 'create_post' %}">Create a New Post</a>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+        {% endif %}
+    </div>
+
+    <h2>Eng yangi postlar</h2>
+    {% for post in latest_posts %}
+        <div>
+            <h3><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h3>
+            <p>{{ post.content|truncatewords:30 }}</p>
+        </div>
+    {% endfor %}
+
+    <h2>Eng ko‘p ko‘rilgan postlar</h2>
+    {% for post in most_viewed_posts %}
+        <div>
+            <h3><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h3>
+            <p>{{ post.content|truncatewords:30 }}</p>
+        </div>
+    {% endfor %}
+
+    <h2>Haftaning eng ommabop postlari</h2>
+    {% for post in weekly_popular_posts %}
+        <div>
+            <h3><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h3>
+            <p>{{ post.content|truncatewords:30 }}</p>
+        </div>
+    {% endfor %}
+
+    <h2>Oyning eng ommabop postlari</h2>
+    {% for post in monthly_popular_posts %}
+        <div>
+            <h3><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h3>
+            <p>{{ post.content|truncatewords:30 }}</p>
+        </div>
+    {% endfor %}
+
+    <h2>Tavsiya qilingan postlar</h2>
+    {% for post in recommended_posts %}
+        <div>
+            <h3><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h3>
+            <p>{{ post.content|truncatewords:30 }}</p>
+        </div>
+    {% endfor %}
+</body>
+</html>
