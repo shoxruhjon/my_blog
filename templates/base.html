@@ -20,9 +20,20 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Qo'shimcha global stillar (agar kerak bo'lsa) */
+        /* Qo'shimcha global stillar */
         body {
             font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Sahifaning minimal balandligi */
+        }
+
+        main {
+            flex: 1; /* Kontentni cho'zish uchun */
+        }
+
+        footer {
+            margin-top: auto; /* Footer-ni pastga surish */
         }
     </style>
 </head>
