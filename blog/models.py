@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from auth_users.models import CustomUser
 
 # Post model
 class Post(models.Model):
@@ -8,7 +8,7 @@ class Post(models.Model):
     image = models.ImageField(upload_to='post_images/', blank=True, null=True)
     category = models.CharField(max_length=100)
     tags = models.CharField(max_length=200)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     is_approved = models.BooleanField(default=False)
     views = models.PositiveIntegerField(default=0)  # Ko'rilganlar soni

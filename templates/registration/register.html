@@ -1,16 +1,14 @@
 {% extends 'base.html' %}
 
-{% block title %}Tizimga Kirish{% endblock %}
+{% block title %}Ro'yxatdan o'tish{% endblock %}
 
 {% block content %}
 <div class="bg-white p-8 rounded-lg shadow-md max-w-md mx-auto">
-    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Tizimga Kirish</h2>
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Yangi Hisob Yaratish</h2>
     <form method="post" novalidate>
         {% csrf_token %}
-         <input type="hidden" name="next" value="{{ next }}">
-
         <div class="space-y-4">
-             {% for field in form %}
+            {% for field in form %}
                 <div>
                     <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
                     {{ field }}
@@ -21,11 +19,14 @@
                             {% endfor %}
                         </div>
                     {% endif %}
+                     {% if field.help_text %}
+                        <p class="mt-2 text-sm text-gray-500">{{ field.help_text }}</p>
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>
 
-         {% if form.non_field_errors %}
+        {% if form.non_field_errors %}
             <div class="mt-4 text-red-600 text-sm">
                 {% for error in form.non_field_errors %}
                     <p>{{ error }}</p>
@@ -33,29 +34,14 @@
             </div>
         {% endif %}
 
-        <div class="flex items-center justify-between mt-6">
-            <div class="flex items-center">
-                <input id="remember_me" name="remember_me" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                <label for="remember_me" class="ml-2 block text-sm text-gray-900">
-                    Meni eslab qol
-                </label>
-            </div>
-
-            <div class="text-sm">
-                <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
-                    Parolni unutdingizmi? </a>
-            </div>
-        </div>
-
         <div class="mt-6">
             <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                Kirish
+                Ro'yxatdan o'tish
             </button>
         </div>
     </form>
     <p class="mt-4 text-center text-sm text-gray-600">
-        Hisobingiz yo'qmi? <a href="{% url 'register' %}" class="font-medium text-indigo-600 hover:text-indigo-500">Ro'yxatdan o'tish</a>
+        Hisobingiz bormi? <a href="{% url 'login' %}" class="font-medium text-indigo-600 hover:text-indigo-500">Tizimga kirish</a>
     </p>
 </div>
 {% endblock %}
-

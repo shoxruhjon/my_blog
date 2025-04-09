@@ -28,6 +28,7 @@ INSTALLED_APPS = [
 
 #    apps
     'blog',
+    'auth_users'
 ]
 
 MIDDLEWARE = [
@@ -116,3 +117,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LOGIN_REDIRECT_URL = 'home'  # Tizimga kirgandan keyin yo'naltiriladigan sahifa nomi
+LOGOUT_REDIRECT_URL = 'login' # Tizimdan chiqqandan keyin yo'naltiriladigan sahifa nomi
+LOGIN_URL = 'login' # Agar @login_required dekoratori ishlatilsa, yo'naltiriladigan sahifa
+
+AUTH_USER_MODEL = 'auth_users.CustomUser'
