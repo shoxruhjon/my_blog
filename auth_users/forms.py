@@ -1,5 +1,3 @@
-# users/forms.py
-
 from django import forms
 from django.contrib.auth import authenticate # authenticate funksiyasini import qilamiz
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
