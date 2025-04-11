@@ -3,7 +3,7 @@
 from django.urls import path
 # Agar users ilovasida bo'lsa: from . import views
 # Agar asosiy loyihada bo'lsa: from users import views (yoki ilovangiz nomi)
-from auth_users import views # Ilovangiz nomiga moslang
+from apps.auth_users import views # Ilovangiz nomiga moslang
 
 urlpatterns = [
     # path('register/', views.register_view, name='register'),
