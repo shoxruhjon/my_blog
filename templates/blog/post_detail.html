@@ -1,59 +1,74 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ post.title }}</title>
-</head>
-<body>
-    <h1>{{ post.title }}</h1>
+{% extends "base.html" %}
 
+{% block title %}{{ post.title }}{% endblock %}
 
-    <div>
-        {% if post.image %}
-            <img src="{{ post.image.url }}" alt="Post Image" style="max-width: 100%; height: auto;">
-        {% endif %}
-        <p>{{ post.content }}</p>
-    </div>
-
-
-    <div>
-        <p><strong>Category:</strong> {{ post.category }}</p>
-        <p><strong>Tags:</strong> {{ post.tags }}</p>
-    </div>
-
-
-    <p><strong>Views:</strong> {{ post.views }}</p>
-
-    <h2>Comments</h2>
-    <ul>
-        {% for comment in comments %}
-            <li><strong>{{ comment.author }}</strong>: {{ comment.text }}</li>
-        {% endfor %}
-    </ul>
-
-
-    <h3>Leave a Comment</h3>
-    {% if user.is_authenticated %}
-        <form method="POST">
-            {% csrf_token %}
-            <label for="author">Your Name:</label>
-            <input type="text" id="author" name="author" required><br>
-            <label for="text">Comment:</label>
-            <textarea id="text" name="text" required></textarea><br>
-            <button type="submit">Submit</button>
-        </form>
-    {% else %}
-        <p>You must be <a href="{% url 'login' %}">logged in</a> to leave a comment.</p>
+{% block content %}
+<article class="bg-white rounded-lg shadow-md overflow-hidden">
+    {% if post.image %}
+        <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-full h-64 md:h-96 object-cover">
     {% endif %}
 
-    <!-- Recommended Posts -->
-    <h3>Recommended Posts</h3>
-    <ul>
-        {% for recommended_post in recommended_posts %}
-            <li><a href="{% url 'post_detail' recommended_post.pk %}">{{ recommended_post.title }}</a></li>
-        {% endfor %}
-    </ul>
+    <div class="p-6 md:p-8">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-medium text-indigo-600">{{ post.category|upper }}</span>
+            {% if post.is_recommended %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    Tavsiya qilingan
+                </span>
+            {% endif %}
+        </div>
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{{ post.title }}</h1>
+        <div class="flex flex-wrap items-center space-x-4 text-sm text-gray-500 mb-6">
+            <span>Muallif: <span class="font-medium">{{ post.author.get_full_name|default:post.author.username }}</span></span>
+            <span class="hidden md:inline">•</span>
+            <span>{{ post.created_at|date:"d F Y, H:i" }}</span>
+            <span class="hidden md:inline">•</span>
+            <span>{{ post.views }} ko'rish</span>
+            <span class="hidden md:inline">•</span>
+            <span>Teglar: {{ post.tags }}</span>
+        </div>
 
-    <p><a href="{% url 'home' %}">Back to Home</a></p>
-</body>
-</html>
+         {# --- Muallif yoki admin uchun tahrirlash/o'chirish tugmalari --- #}
+         {% if user == post.author or user.is_staff %}
+         <div class="mb-6 border-t pt-4 flex space-x-4">
+             <a href="{% url 'blog:post_update' post.pk %}" class="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 text-sm font-medium">
+                 Tahrirlash
+             </a>
+             <a href="{% url 'blog:post_delete' post.pk %}" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm font-medium">
+                 O'chirish
+             </a>
+             {% if not post.is_approved and user.is_staff %}
+                {# Admin uchun tasdiqlash tugmasi (buni alohida view bilan qilish yaxshiroq) #}
+                <span class="text-sm text-orange-600 italic">(Tasdiqlanmagan)</span>
+             {% endif %}
+         </div>
+         {% endif %}
+        {# --- Tasdiqlanmagan post haqida xabar (muallif/admin uchun) --- #}
+         {% if not post.is_approved and (user == post.author or user.is_staff) %}
+             <div class="mb-6 p-4 rounded-md bg-yellow-100 border border-yellow-400 text-yellow-700 text-sm" role="alert">
+                 Bu post hali tasdiqlanmagan va faqat siz (yoki administratorlar) ko'rishingiz mumkin. Administrator tasdiqlagandan so'ng hamma uchun ko'rinadi.
+             </div>
+         {% endif %}
+
+
+        <div class="prose prose-indigo max-w-none text-gray-700 leading-relaxed">
+            {# prose klassi kontentga avtomatik stil beradi #}
+            {{ post.content|linebreaks }} {# linebreaks <p> teglari qo'shadi #}
+        </div>
+
+        <hr class="my-8">
+
+        <a href="{% url 'home' %}" class="inline-flex items-center text-indigo-600 hover:text-indigo-800">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+            Barcha postlarga qaytish
+        </a>
+    </div>
+</article>
+{% endblock %}
+
+{% block extra_js %}
+{# Agar @tailwindcss/typography pluginini ishlatsangiz, bu kerak emas #}
+{# Agar ishlatmasangiz, content uchun stil berish kerak bo'lishi mumkin #}
+{% endblock %}

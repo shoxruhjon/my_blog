@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title|default:"Post Formasi" }}{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold text-gray-800 mb-6">{{ page_title|default:"Post Formasi" }}</h1>
+
+<form method="post" enctype="multipart/form-data" class="bg-white p-6 rounded-lg shadow-md space-y-6">
+    {% csrf_token %}
+
+    <div>
+        <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700">Sarlavha</label>
+        {{ form.title }}
+         {% if form.title.errors %}<div class="mt-1 text-sm text-red-600">{{ form.title.errors }}</div>{% endif %}
+    </div>
+    <div>
+        <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700">Kategoriya</label>
+        {{ form.category }}
+         {% if form.category.errors %}<div class="mt-1 text-sm text-red-600">{{ form.category.errors }}</div>{% endif %}
+    </div>
+    <div>
+        <label for="{{ form.tags.id_for_label }}" class="block text-sm font-medium text-gray-700">Teglar (vergul bilan ajrating)</label>
+        {{ form.tags }}
+         {% if form.tags.errors %}<div class="mt-1 text-sm text-red-600">{{ form.tags.errors }}</div>{% endif %}
+    </div>
+    <div>
+        <label for="{{ form.image.id_for_label }}" class="block text-sm font-medium text-gray-700">Rasm</label>
+         {% if form.instance.image %}
+            <p class="text-xs text-gray-500 mb-1">Joriy rasm: <a href="{{ form.instance.image.url }}" target="_blank" class="text-indigo-600">{{ form.instance.image.name }}</a></p>
+         {% endif %}
+        {{ form.image }}
+         {% if form.image.errors %}<div class="mt-1 text-sm text-red-600">{{ form.image.errors }}</div>{% endif %}
+    </div>
+    <div>
+        <label for="{{ form.content.id_for_label }}" class="block text-sm font-medium text-gray-700">Mazmuni</label>
+        {{ form.content }}
+         {% if form.content.errors %}<div class="mt-1 text-sm text-red-600">{{ form.content.errors }}</div>{% endif %}
+    </div>
+
+    {% if form.is_approved %}
+    <div class="flex items-start">
+        <div class="flex items-center h-5">
+             {{ form.is_approved }}
+        </div>
+         <div class="ml-3 text-sm">
+            <label for="{{ form.is_approved.id_for_label }}" class="font-medium text-gray-700">Tasdiqlangan</label>
+        </div>
+         {% if form.is_approved.errors %}<div class="mt-1 text-sm text-red-600">{{ form.is_approved.errors }}</div>{% endif %}
+    </div>
+    {% endif %}
+    {% if form.is_recommended %}
+    <div class="flex items-start">
+         <div class="flex items-center h-5">
+             {{ form.is_recommended }}
+        </div>
+         <div class="ml-3 text-sm">
+            <label for="{{ form.is_recommended.id_for_label }}" class="font-medium text-gray-700">Tavsiya qilingan</label>
+        </div>
+         {% if form.is_recommended.errors %}<div class="mt-1 text-sm text-red-600">{{ form.is_recommended.errors }}</div>{% endif %}
+    </div>
+    {% endif %}
+
+    <div class="flex justify-end space-x-4 pt-4 border-t">
+        {% url 'home' as home_url %}
+        <a href="{{ request.META.HTTP_REFERER|default:home_url }}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 text-sm font-medium">
+            Bekor qilish
+        </a>
+        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium">
+            Saqlash
+        </button>
+    </div>
+</form>
+{% endblock %}
