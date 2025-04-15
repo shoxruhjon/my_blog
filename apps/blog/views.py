@@ -8,28 +8,21 @@ from .models import Post
 from .forms import PostForm # PostForm'ni import qilamiz (keyinroq yaratamiz)
 
 class PostListView(generic.ListView):
-    """
-    Barcha tasdiqlangan postlar ro'yxatini ko'rsatadi (Endi bu home page uchun ishlatiladi).
-    """
     model = Post
-    # template_name endi asosiy loyihaning urls.py'sida belgilanadi
-    # yoki agar u /blog/ da qolsa 'blog/post_list.html' ishlatiladi.
-    # Hozircha home.html ga moslashtiramiz deb faraz qilamiz.
-    template_name = 'home.html' # home.html ni ishlatamiz
+    template_name = 'home.html'
     context_object_name = 'posts'
     paginate_by = 10
 
     def get_queryset(self):
-        """
-        Faqat tasdiqlangan (is_approved=True) postlarni qaytaradi.
-        Eng so'nggi qo'shilganlari birinchi ko'rinadi.
-        """
         return Post.objects.filter(is_approved=True).order_by('-created_at')
+    
+    def get_queryset(self):
+        queryset = Post.objects.filter(is_approved=True).order_by('-created_at')
+        print("Tasdiqlangan postlar ro'yxati:", queryset)
+        return queryset
+
 
 class PostDetailView(generic.DetailView):
-    """
-    Bitta postni batafsil ko'rsatadi.
-    """
     model = Post
     template_name = 'blog/post_detail.html'
     context_object_name = 'post'
@@ -37,19 +30,23 @@ class PostDetailView(generic.DetailView):
     def get_object(self, queryset=None):
         obj = super().get_object(queryset=queryset)
         if obj.is_approved:
-            # Ko'rishlar sonini atomik tarzda oshiramiz
             Post.objects.filter(pk=obj.pk).update(views=F('views') + 1)
             obj.refresh_from_db()
-        elif not self.request.user.is_staff and self.request.user != obj.author: # Agar admin yoki muallif bo'lmasa
-             raise Http404("Post topilmadi yoki tasdiqlanmagan.")
-        # Muallif yoki admin tasdiqlanmagan postni ko'rishi mumkin
+        elif self.request.user == obj.author or self.request.user.is_staff:
+            # Muallif yoki admin tasdiqlanmagan postni ko'rishi mumkin
+            pass
+        else:
+            raise Http404("Post topilmadi yoki tasdiqlanmagan.")
         return obj
 
     def get_queryset(self):
         qs = super().get_queryset()
-        # Admin yoki muallif bo'lmasa, faqat tasdiqlanganlarni qidiramiz
-        if not self.request.user.is_staff and (not self.request.user.is_authenticated or self.request.user != self.get_object().author):
+        if not self.request.user.is_staff and not self.request.user.is_authenticated:
             return qs.filter(is_approved=True)
+        elif not self.request.user.is_staff and self.request.user.is_authenticated:
+            # Muallif bo'lmagan autentifikatsiya qilingan foydalanuvchilar uchun faqat tasdiqlangan postlar
+            return qs.filter(is_approved=True)
+        # Adminlar va mualliflar barcha postlarni ko'rishi mumkin (bu yerda filtrlash kerak emas)
         return qs
 
 # --- Yangi ko'rinishlar ---
@@ -77,8 +74,7 @@ class PostCreateView(LoginRequiredMixin, generic.CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        """Muvaffaqiyatli yaratilgandan so'ng post detail sahifasiga yo'naltirish."""
-        # self.object bu yerda yangi yaratilgan post
+        print(f"Yangi post ID: {self.object.pk}")
         return reverse_lazy('blog:post_detail', kwargs={'pk': self.object.pk})
 
     def get_context_data(self, **kwargs):
@@ -86,7 +82,11 @@ class PostCreateView(LoginRequiredMixin, generic.CreateView):
         context = super().get_context_data(**kwargs)
         context['page_title'] = "Yangi Post Yaratish"
         return context
-
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
     """
@@ -125,6 +125,11 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView
         context = super().get_context_data(**kwargs)
         context['page_title'] = "Postni Tahrirlash"
         return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
 
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView):

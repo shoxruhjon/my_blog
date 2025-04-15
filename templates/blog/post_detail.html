@@ -44,7 +44,7 @@
          </div>
          {% endif %}
         {# --- Tasdiqlanmagan post haqida xabar (muallif/admin uchun) --- #}
-         {% if not post.is_approved and (user == post.author or user.is_staff) %}
+         {% if user == post.author or user.is_staff %}
              <div class="mb-6 p-4 rounded-md bg-yellow-100 border border-yellow-400 text-yellow-700 text-sm" role="alert">
                  Bu post hali tasdiqlanmagan va faqat siz (yoki administratorlar) ko'rishingiz mumkin. Administrator tasdiqlagandan so'ng hamma uchun ko'rinadi.
              </div>
