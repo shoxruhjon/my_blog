@@ -11,14 +11,13 @@ class Post(models.Model):
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     is_approved = models.BooleanField(default=False)
-    views = models.PositiveIntegerField(default=0)  # Ko'rilganlar soni
-    is_recommended = models.BooleanField(default=False)  # Tavsiya qilingan postlar
+    views = models.PositiveIntegerField(default=0) 
+    is_recommended = models.BooleanField(default=False) 
 
     def __str__(self):
         return self.title
 
 
-# Comment model
 class Comment(models.Model):
     post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
     author = models.CharField(max_length=100)

@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth import authenticate # authenticate funksiyasini import qilamiz
+from django.contrib.auth import authenticate 
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -36,9 +36,6 @@ class CustomAuthenticationForm(AuthenticationForm):
     """
     Email yoki Username orqali tizimga kirish formasi.
     """
-    # AuthenticationForm standart 'username' maydonini ishlatadi.
-    # Biz uni 'login' deb nomlaymiz va labelini o'zgartiramiz.
-    # Endi bu maydon CharField bo'ladi, chunki u email yoki username bo'lishi mumkin.
     login = forms.CharField(
         label=_("Email yoki Foydalanuvchi nomi"),
         widget=forms.TextInput(attrs={
@@ -47,10 +44,8 @@ class CustomAuthenticationForm(AuthenticationForm):
             'placeholder': 'Email yoki foydalanuvchi nomingiz'
             })
     )
-    # Standart 'username' maydonini olib tashlaymiz (chunki 'login' ni qo'shdik)
-    username = None # Buni None qilish kerak emas, AuthenticationForm buni o'zi boshqaradi
+    username = None
 
-    # Parol maydoni o'zgarishsiz qoladi
     password = forms.CharField(
         label=_("Parol"),
         strip=False,
@@ -75,20 +70,17 @@ class CustomAuthenticationForm(AuthenticationForm):
         """
         self.request = request
         self.user_cache = None
-        super(AuthenticationForm, self).__init__(*args, **kwargs) # AuthenticationForm ning initini chaqiramiz
-
-        # 'login' maydonini field_order ga qo'shish (agar kerak bo'lsa)
-        # self.fields.keyOrder = ['login', 'password'] # Django versiyasiga qarab
+        super(AuthenticationForm, self).__init__(*args, **kwargs) 
 
     def clean(self):
-        # 'login' maydonidan kelgan qiymatni olamiz
+        
         login_input = self.cleaned_data.get('login')
         password = self.cleaned_data.get('password')
 
         if login_input is not None and password:
-            # Email orqali autentifikatsiya qilishga urinib ko'ramiz
+            
             self.user_cache = authenticate(self.request, email=login_input, password=password)
-            # Agar email orqali topilmasa, username orqali urinib ko'ramiz
+            
             if self.user_cache is None:
                  self.user_cache = authenticate(self.request, username=login_input, password=password)
 
@@ -102,11 +94,11 @@ class CustomAuthenticationForm(AuthenticationForm):
     def get_user(self):
         return self.user_cache
 
-    # Bu metodni qo'shish muhim, chunki AuthenticationForm buni kutadi
+    
     def get_invalid_login_error(self):
          return ValidationError(
             self.error_messages['invalid_login'],
             code='invalid_login',
-            params={'username': _('Email yoki Foydalanuvchi nomi')} # Labelni moslashtiramiz
+            params={'username': _('Email yoki Foydalanuvchi nomi')}
         )
 

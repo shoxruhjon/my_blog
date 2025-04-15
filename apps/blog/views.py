@@ -1,11 +1,11 @@
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
 from django.db.models import F
-from django.urls import reverse_lazy # URL manzilini qaytarish uchun
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin # Kirish va huquqlarni tekshirish uchun
-from django.http import Http404 # 404 xatolik uchun
+from django.urls import reverse_lazy 
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin 
+from django.http import Http404 
 from .models import Post
-from .forms import PostForm # PostForm'ni import qilamiz (keyinroq yaratamiz)
+from .forms import PostForm 
 
 class PostListView(generic.ListView):
     model = Post
@@ -33,7 +33,6 @@ class PostDetailView(generic.DetailView):
             Post.objects.filter(pk=obj.pk).update(views=F('views') + 1)
             obj.refresh_from_db()
         elif self.request.user == obj.author or self.request.user.is_staff:
-            # Muallif yoki admin tasdiqlanmagan postni ko'rishi mumkin
             pass
         else:
             raise Http404("Post topilmadi yoki tasdiqlanmagan.")
@@ -44,33 +43,31 @@ class PostDetailView(generic.DetailView):
         if not self.request.user.is_staff and not self.request.user.is_authenticated:
             return qs.filter(is_approved=True)
         elif not self.request.user.is_staff and self.request.user.is_authenticated:
-            # Muallif bo'lmagan autentifikatsiya qilingan foydalanuvchilar uchun faqat tasdiqlangan postlar
+            
             return qs.filter(is_approved=True)
-        # Adminlar va mualliflar barcha postlarni ko'rishi mumkin (bu yerda filtrlash kerak emas)
+        
         return qs
 
-# --- Yangi ko'rinishlar ---
+
 
 class PostCreateView(LoginRequiredMixin, generic.CreateView):
     """
     Yangi post yaratish uchun ko'rinish. Faqat tizimga kirgan foydalanuvchilar uchun.
     """
     model = Post
-    form_class = PostForm # forms.py'da yaratilgan formani ishlatamiz
+    form_class = PostForm 
     template_name = 'blog/post_form.html'
-    # success_url = reverse_lazy('blog:post_list') # Muvaffaqiyatli yaratilgandan so'ng qaytish manzili
+    # success_url = reverse_lazy('blog:post_list') 
 
     def form_valid(self, form):
         """
         Forma to'g'ri to'ldirilganda avtomatik ravishda muallifni belgilaydi.
         """
         form.instance.author = self.request.user
-        # Yangi postlar odatda tasdiqlanmagan bo'ladi (agar admin yaratmasa)
         if not self.request.user.is_staff:
              form.instance.is_approved = False
         else:
-             # Agar admin yaratsa, darhol tasdiqlashi mumkin (ixtiyoriy)
-             form.instance.is_approved = True # Yoki buni False qoldirib, keyin admin panelda tasdiqlash
+             form.instance.is_approved = True 
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -95,7 +92,6 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView
     model = Post
     form_class = PostForm
     template_name = 'blog/post_form.html'
-    # success_url post detail sahifasiga yo'naltiriladi (get_success_url orqali)
 
     def test_func(self):
         """
@@ -106,14 +102,9 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView
 
     def form_valid(self, form):
         """Tahrirlanganda is_approved statusini o'zgartirmaslik (agar kerak bo'lsa)"""
-        # Agar admin tahrirlamasa va post tasdiqlangan bo'lsa, statusni o'zgartirmaymiz
-        # Yoki admin tahrirlasa, statusni o'zgartirishi mumkin
-        # Bu logikani o'zingizga moslashtiring
         if not self.request.user.is_staff:
             original_post = Post.objects.get(pk=self.object.pk)
-            form.instance.is_approved = original_post.is_approved # Avvalgi statusni saqlash
-        # Agar admin tahrirlasa, formadagi is_approved qiymati saqlanadi (agar formada bo'lsa)
-        # Agar is_approved formaga qo'shilmagan bo'lsa, uni alohida handle qilish kerak
+            form.instance.is_approved = original_post.is_approved 
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -138,7 +129,7 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView
     """
     model = Post
     template_name = 'blog/post_confirm_delete.html'
-    success_url = reverse_lazy('home') # O'chirilgandan so'ng asosiy sahifaga qaytish
+    success_url = reverse_lazy('home') 
 
     def test_func(self):
         """

@@ -4,8 +4,7 @@ from .models import Post
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['title', 'content', 'image', 'category', 'tags'] # Foydalanuvchi to'ldiradigan maydonlar
-        # Muallif, created_at, views avtomatik yoki view'da belgilanadi
+        fields = ['title', 'content', 'image', 'category', 'tags'] 
 
         widgets = {
             'title': forms.TextInput(attrs={'class': 'w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500'}),
@@ -16,10 +15,10 @@ class PostForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None) # view'dan user'ni olish
+        user = kwargs.pop('user', None) 
         super().__init__(*args, **kwargs)
         if user and user.is_staff:
             self.fields['is_approved'] = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500'}))
             self.fields['is_recommended'] = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500'}))
-            # Meta'dagi fields ro'yxatiga ham qo'shish kerak bo'ladi
+           
             self.Meta.fields = ['title', 'content', 'image', 'category', 'tags', 'is_approved', 'is_recommended']
