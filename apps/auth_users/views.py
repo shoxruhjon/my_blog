@@ -3,6 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.urls import reverse_lazy
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
+from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
 from django.views.generic.edit import FormView
 
 
@@ -74,8 +75,19 @@ def logout_view(request):
     return redirect('login')
 
 
-
-from django.shortcuts import render
-
 def home_view(request):
     return render(request, 'home.html', {'title': 'Home'})
+
+
+class CustomPasswordChangeView(PasswordChangeView):
+    """
+    Parolni o'zgartirish uchun class-based view.
+    """
+    template_name = 'registration/password_change.html'
+    success_url = reverse_lazy('password_change_done')
+
+class CustomPasswordChangeDoneView(PasswordChangeDoneView):
+    """
+    Parol muvaffaqiyatli o'zgartirilgandan so'ng ko'rsatiladigan sahifa.
+    """
+    template_name = 'registration/password_change_done.html'
