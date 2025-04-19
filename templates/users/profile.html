@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Mening Profilim{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto mt-8 bg-white shadow-md rounded p-6">
+  <h1 class="text-2xl font-bold mb-4">Mening profilim</h1>
+
+  {% if user_profile.profile_picture %}
+    <img src="{{ user_profile.profile_picture.url }}" class="w-32 h-32 rounded-full mx-auto mb-4" alt="Profile Picture">
+  {% else %}
+    <div class="w-32 h-32 rounded-full mx-auto bg-gray-200 flex items-center justify-center mb-4">
+      <span class="text-gray-500">Rasm yo'q</span>
+    </div>
+  {% endif %}
+
+  <p><strong>Foydalanuvchi nomi:</strong> {{ user_profile.username }}</p>
+  <p><strong>Ism:</strong> {{ user_profile.first_name }}</p>
+  <p><strong>Familiya:</strong> {{ user_profile.last_name }}</p>
+  <p><strong>Email:</strong> {{ user_profile.email }}</p>
+  <p><strong>Tug‘ilgan sana:</strong> {{ user_profile.birth_date }}</p>
+  <p><strong>Hudud:</strong> {{ user_profile.location }}</p>
+  <p><strong>Bio:</strong> {{ user_profile.bio }}</p>
+
+  <a href="{% url 'edit_profile' %}" class="mt-4 inline-block bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700">
+    Profilni tahrirlash
+  </a>
+</div>
+{% endblock %}

@@ -4,6 +4,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from .models import CustomUser
+from django.contrib.auth.forms import UserChangeForm
+
 
 class CustomUserCreationForm(UserCreationForm):
     """
@@ -102,3 +104,17 @@ class CustomAuthenticationForm(AuthenticationForm):
             params={'username': _('Email yoki Foydalanuvchi nomi')}
         )
 
+class CustomUserChangeForm(UserChangeForm):
+    """
+    Foydalanuvchi profilini tahrirlash formasi.
+    """
+    class Meta:
+        model = CustomUser
+        fields = ('email', 'username', 'first_name', 'last_name', 'bio', 'profile_picture', 'birth_date', 'location')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs.update({
+                'class': 'mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+            })

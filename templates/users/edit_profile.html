@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Profilni Tahrirlash{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto bg-white p-6 rounded shadow-md mt-6">
+    <h2 class="text-2xl font-bold mb-4">Profilni tahrirlash</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form %}
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <p class="text-red-500 text-sm">{{ field.errors|striptags }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="w-full py-2 px-4 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+            Saqlash
+        </button>
+    </form>
+</div>
+{% endblock %}

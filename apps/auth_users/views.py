@@ -2,10 +2,14 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.urls import reverse_lazy
-from .forms import CustomUserCreationForm, CustomAuthenticationForm
+from .forms import CustomUserCreationForm, CustomAuthenticationForm, CustomUserChangeForm
 from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
 from django.views.generic.edit import FormView
-
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.forms import UserChangeForm
+from .models import CustomUser
+from django.views.generic.edit import UpdateView
+from django.views.generic import DetailView
 
 from django.views import View
 
@@ -91,3 +95,29 @@ class CustomPasswordChangeDoneView(PasswordChangeDoneView):
     Parol muvaffaqiyatli o'zgartirilgandan so'ng ko'rsatiladigan sahifa.
     """
     template_name = 'registration/password_change_done.html'
+
+
+class ProfileView(LoginRequiredMixin, View):
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        return render(request, 'profile.html', {'user': request.user})
+
+
+class ProfileView(LoginRequiredMixin, DetailView):
+    model = CustomUser
+    template_name = 'users/profile.html'
+    context_object_name = 'user_profile'
+
+    def get_object(self):
+        return self.request.user
+    
+
+class ProfileEditView(LoginRequiredMixin, UpdateView):
+    model = CustomUser
+    form_class = CustomUserChangeForm
+    template_name = 'users/edit_profile.html'
+    success_url = reverse_lazy('home')
+
+    def get_object(self):
+        return self.request.user
